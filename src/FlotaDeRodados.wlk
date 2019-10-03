@@ -1,6 +1,6 @@
 class Corsa {
 	var property color
-	method velocidad() { return 150 }
+	method velocidadMax() { return 150 }
 	method peso() { return 1300 }
 	method capacidad() { return 4 }
 }
@@ -8,7 +8,7 @@ class Corsa {
 class Kwid {
 	var property tAdicional = false
 	method color() { return "azul" }
-	method velocidad() { return if(tAdicional){120} else {110} }
+	method velocidadMax() { return if(tAdicional){120} else {110} }
 	method peso() { return if (tAdicional) {1200+150} else {1200} }
 	method capacidad() { return if(tAdicional){3}else{4} }
 }
@@ -17,7 +17,7 @@ object traffic {
 	var property interior
 	var property motor
 	method capacidad()= return interior.capacidad()
-	method velocidad()= return motor.velocidad()
+	method velocidadMax()= return motor.velocidad()
 	method peso() { return motor.peso()+interior.peso()+4000 }
 	method color() { return "blanco" }
 }
@@ -86,7 +86,7 @@ class Dependencia {
 	method capacidadTotalEnColor(unColor) {
 		return self.rodadoEnColor(unColor).sum({c=>c.capacidad()})
 	}
-	method colorDelRodadMasRapido() {
+	method colorDelRodadoMasRapido() {
 		return flota.max({c=>c.velocidad()}).color()
 	}
 	method capacidadTotal() {
@@ -99,10 +99,10 @@ class Dependencia {
 		return empleados.size()>=40 and flota.size()>=5
 	}
 	method noPuedenSerSatisfechos() {
-		return pedidos.filter({e=>not self.puedeSerSatisfechis(e)})
+		return pedidos.filter({e=>not self.puedeSerSatisfecho(e)})
 	}
 	method puedeSerSatisfecho(pedido) {
-		return flota.any({ a=> pedido.puedeSatisacerUnPedido(a)})
+		return flota.any({a=>pedido.puedeSatisacerUnPedido(a)})
 	}
 }
 
@@ -118,10 +118,9 @@ class Pedidos {
 	
 	method puedeSatisfacerUnPedido(auto) {
 		return auto.velocidadMax() - self.velocidad() >= 10
-		&& auto.capacidad() >= cantdPasajeros
-		&&not coloresIncompatibles.any({c=>c==auto.color()})
+		and auto.capacidad() >= cantdPasajeros
+		and not coloresIncompatibles.any({c=>c==auto.color()})
 	}
-	
 	method acelerar() {
 		tiempoMaximo = 1.max(tiempoMaximo -1) //como estoy bucando el min uso el max
 	}
