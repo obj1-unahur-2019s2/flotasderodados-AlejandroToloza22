@@ -17,7 +17,7 @@ object traffic {
 	var property interior
 	var property motor
 	method capacidad()= return interior.capacidad()
-	method velocidadMax()= return motor.velocidad()
+	method velocidadMax()= return motor.velocidadMax()
 	method peso() { return motor.peso()+interior.peso()+4000 }
 	method color() { return "blanco" }
 }
@@ -59,7 +59,7 @@ class Especial {
 }
 
 class Dependencia {
-	var pedidos
+	var pedidos = []
 	var flota = []
 	var empleados = []
 	method agregarAFlota(rodado) {
@@ -75,7 +75,7 @@ class Dependencia {
 		return flota.size()>=3
 	}
 	method estaBienEquipadoEnVelocidad() {
-		return flota.all({c=>c.velocidad()>=100})
+		return flota.all({c=>c.velocidadMax()>=100})
 	}
 	method estaBienEquipada() {
 		return self.estaBienEquipadoEnTamanio() and self.estaBienEquipadoEnVelocidad()
@@ -87,22 +87,31 @@ class Dependencia {
 		return self.rodadoEnColor(unColor).sum({c=>c.capacidad()})
 	}
 	method colorDelRodadoMasRapido() {
-		return flota.max({c=>c.velocidad()}).color()
+		return flota.max({c=>c.velocidadMax()}).color()
 	}
 	method capacidadTotal() {
 		return flota.sum({c=>c.capacidad()})
 	}
 	method capacidadFaltante() {
-		return 0.max({empleados - self.capacidadTotal()})
+		return 0.max(empleados - self.capacidadTotal())
 	}
 	method esGrande() {
 		return empleados.size()>=40 and flota.size()>=5
 	}
+	method puedeSerSatisfecho(pedido) {
+		return flota.any({a=>pedido.puedeSatisfacerUnPedido(a)})
+	}
+	method agregarPedido(pedido) {
+		return pedidos.add(pedido)
+	}
+	method removerPedido(pedido) {
+		return pedidos.remove(pedido)
+	}
+	method totalDePasajeros() {
+		return pedidos.sum({c=>c.cantdPasajeros()})
+	}
 	method noPuedenSerSatisfechos() {
 		return pedidos.filter({e=>not self.puedeSerSatisfecho(e)})
-	}
-	method puedeSerSatisfecho(pedido) {
-		return flota.any({a=>pedido.puedeSatisacerUnPedido(a)})
 	}
 }
 
@@ -117,7 +126,7 @@ class Pedidos {
 	method velocidad() { return distancia / tiempoMaximo }
 	
 	method puedeSatisfacerUnPedido(auto) {
-		return auto.velocidadMax() - self.velocidad() >= 10
+		return auto.velocidadMax() >= self.velocidad() + 10
 		and auto.capacidad() >= cantdPasajeros
 		and not coloresIncompatibles.any({c=>c==auto.color()})
 	}
